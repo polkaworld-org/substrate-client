@@ -1,0 +1,8 @@
+name: substrate-client
+author: "PolkaWorld"
+about: WorkShop
+subcommands:
+  - transfer:
+      about: Author and sign a Node balances::Transfer transaction with a given (secret) key
+  - balance:
+      about: Query balance

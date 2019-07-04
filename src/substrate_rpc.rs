@@ -10,7 +10,6 @@ use sr_primitives::generic::Era;
 use srml_support::storage::StorageMap;
 use substrate_primitives::crypto::Pair as TraitPair;
 use substrate_primitives::hexdisplay::HexDisplay;
-use substrate_primitives::twox_128;
 use substrate_primitives::{blake2_256, sr25519::Pair};
 use Rpc;
 
@@ -28,7 +27,7 @@ pub fn genesis_hash(client: &mut Rpc) -> Hash {
 
 pub fn account_balance(client: &mut Rpc, account_id: &AccountId) {
     let key = <srml_balances::FreeBalance<Runtime>>::key_for(account_id);
-    let key = twox_128(&key);
+    let key = blake2_256(&key);
     let key = format!("0x{:}", HexDisplay::from(&key));
     let balance = client
         .request::<Value>("state_getStorage", vec![json!(key)])
@@ -40,7 +39,7 @@ pub fn account_balance(client: &mut Rpc, account_id: &AccountId) {
 
 pub fn account_nonce(client: &mut Rpc, account_id: &AccountId) -> Nonce {
     let key = <srml_system::AccountNonce<Runtime>>::key_for(account_id);
-    let key = twox_128(&key);
+    let key = blake2_256(&key);
     let key = format!("0x{:}", HexDisplay::from(&key));
     let nonce = client
         .request::<Value>("state_getStorage", vec![json!(key)])
