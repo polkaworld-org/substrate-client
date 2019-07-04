@@ -1,3 +1,5 @@
+// Copyright 2019 PolkaWorld.
+
 use std::collections::BTreeMap;
 use std::fmt::{Debug, Error as FmtError, Formatter};
 use std::sync::atomic::{AtomicUsize, Ordering};
