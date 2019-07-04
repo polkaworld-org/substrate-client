@@ -1,0 +1,24 @@
+[package]
+name = "substrate_client"
+version = "0.1.0"
+authors = ["gguoss"]
+
+[dependencies]
+jsonrpc-client-core = "0.5.0"
+keccak-hash = "0.1"
+url = "1.2.0"
+parking_lot = "0.7"
+parity-codec = "4.1.1"
+jsonrpc-ws-server = { git = "https://github.com/paritytech/jsonrpc.git" }
+jsonrpc-core = { git = "https://github.com/paritytech/jsonrpc.git" }
+srml-system = { path = "../substrate/srml/system" }
+srml-support = { path = "../substrate/srml/support" }
+substrate-primitives = { path = "../substrate/core/primitives" }
+sr-primitives = { path = "../substrate/core/sr-primitives" }
+node-template-runtime = { path = "../substrate/node-template/runtime" }
+futures = "0.1"
+log = "0.4"
+serde = "1.0"
+serde_json = "1.0"
+env_logger = "0.6"
+hex = "*"
