@@ -12,6 +12,7 @@ parity-codec = "4.1.1"
 jsonrpc-ws-server = { git = "https://github.com/paritytech/jsonrpc.git" }
 jsonrpc-core = { git = "https://github.com/paritytech/jsonrpc.git" }
 srml-system = { path = "../substrate/srml/system" }
+srml-balances = { path = "../substrate/srml/balances" }
 srml-support = { path = "../substrate/srml/support" }
 substrate-primitives = { path = "../substrate/core/primitives" }
 sr-primitives = { path = "../substrate/core/sr-primitives" }

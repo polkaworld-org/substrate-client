@@ -14,26 +14,8 @@ use substrate_primitives::twox_128;
 use substrate_primitives::{blake2_256, sr25519::Pair};
 use Rpc;
 
-pub struct RawSeed<'a>(&'a str);
-
-impl<'a> RawSeed<'a> {
-    pub fn new(seed: &'a str) -> Self {
-        RawSeed(seed)
-    }
-
-    // Unsafe, for test only
-    pub fn pair(&self) -> Pair {
-        let seed = &self.0;
-        let mut s: [u8; 32] = [' ' as u8; 32];
-        let len = ::std::cmp::min(32, seed.len());
-        &mut s[..len].copy_from_slice(&seed.as_bytes()[..len]);
-        Pair::from_seed(&s)
-    }
-
-    pub fn account_id(&self) -> AccountId {
-        let pair = Self::pair(self);
-        AccountId::from(pair.public())
-    }
+pub fn account_pair(s: &str) -> Pair {
+    Pair::from_string(&format!("//{}", s), None).expect("static values are valid; qed")
 }
 
 pub fn genesis_hash(client: &mut Rpc) -> Hash {
@@ -42,6 +24,18 @@ pub fn genesis_hash(client: &mut Rpc) -> Hash {
         .wait()
         .unwrap()
         .unwrap()
+}
+
+pub fn account_balance(client: &mut Rpc, account_id: &AccountId) {
+    let key = <srml_balances::FreeBalance<Runtime>>::key_for(account_id);
+    let key = twox_128(&key);
+    let key = format!("0x{:}", HexDisplay::from(&key));
+    let balance = client
+        .request::<Value>("state_getStorage", vec![json!(key)])
+        .wait()
+        .unwrap()
+        .unwrap();
+    println!("account:{:?}, balance:{:?}", account_id, balance);
 }
 
 pub fn account_nonce(client: &mut Rpc, account_id: &AccountId) -> Nonce {
@@ -71,17 +65,23 @@ pub fn transfer(client: &mut Rpc, tx: String) -> u64 {
         .unwrap()
 }
 
-pub fn generate_transfer_tx(seed: &RawSeed, from: AccountId, index: Nonce, hash: Hash) -> String {
+pub fn generate_transfer_tx(
+    pair: &Pair,
+    from: AccountId,
+    index: Nonce,
+    hash: Hash,
+    to: AccountId,
+) -> String {
     let func = runtime::Call::Balances(runtime::BalancesCall::transfer::<runtime::Runtime>(
-        Default::default(),
+        to.into(),
         10000 as u128,
     ));
 
-    generate_tx(seed, from, func, index, (Era::Immortal, hash))
+    generate_tx(pair, from, func, index, (Era::Immortal, hash))
 }
 
 fn generate_tx(
-    raw_seed: &RawSeed,
+    pair: &Pair,
     sender: AccountId,
     function: Call,
     index: Nonce,
@@ -91,7 +91,7 @@ fn generate_tx(
     let hash: Hash = e.1;
     let sign_index: Compact<Nonce> = index.into();
     let signed: Address = sender.into();
-    let signer = raw_seed.pair();
+    let signer = pair.clone();
 
     let raw_payload = (sign_index, function.clone(), era, hash);
     let signature = raw_payload.using_encoded(|payload| {

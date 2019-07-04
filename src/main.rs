@@ -17,6 +17,7 @@ extern crate hex;
 extern crate node_template_runtime as runtime;
 extern crate parity_codec as codec;
 extern crate sr_primitives;
+extern crate srml_balances;
 extern crate srml_support;
 extern crate srml_system;
 extern crate substrate_primitives;
@@ -30,6 +31,7 @@ use jsonrpc_core::Notification;
 use std::fs::File;
 use std::io::Read;
 use std::sync::mpsc;
+use substrate_primitives::Pair;
 
 pub fn read_a_file() -> std::io::Result<Vec<u8>> {
     let mut file = try!(File::open("upgrade.wasm"));
@@ -43,7 +45,7 @@ pub fn read_a_file() -> std::io::Result<Vec<u8>> {
 fn substrate_thread(
     send_tx: mpsc::Sender<jsonrpc_ws_server::ws::Message>,
 ) -> Result<Rpc, RpcError> {
-    let port = 8087;
+    let port = 9944;
     Rpc::new(&format!("ws://127.0.0.1:{}", port), send_tx)
 }
 
@@ -55,24 +57,31 @@ fn execute(matches: clap::ArgMatches) {
     let (send_tx, recv_tx) = mpsc::channel();
     let mut substrate_client = substrate_thread(send_tx.clone()).unwrap();
     let substrate_genesis_hash = substrate_rpc::genesis_hash(&mut substrate_client);
-    println!("substrate genesis hash: {:?}", substrate_genesis_hash);
-    let raw_seed = substrate_rpc::RawSeed::new("Alice");
-    let account = raw_seed.account_id();
-    let index = substrate_rpc::account_nonce(&mut substrate_client, &account);
+    let alice_pair = substrate_rpc::account_pair("Alice");
+    let alice = alice_pair.public();
+    let bob_pair = substrate_rpc::account_pair("Bob");
+    let bob = bob_pair.public();
+    let index = substrate_rpc::account_nonce(&mut substrate_client, &alice);
 
     match matches.subcommand() {
-        ("transfer", Some(matches)) => {
+        ("transfer", Some(_matches)) => {
             /*let to = matches.value_of("to")
                 .expect("parameter is required; thus it can't be None; qed");
             let amount = matches.value_of("amount")
                 .expect("parameter is required; thus it can't be None; qed");*/
             let tx = substrate_rpc::generate_transfer_tx(
-                &raw_seed,
-                account,
+                &alice_pair,
+                alice,
                 index,
                 substrate_genesis_hash,
+                bob,
             );
             substrate_rpc::transfer(&mut substrate_client, tx);
+        }
+        ("balance", Some(_matches)) => {
+            substrate_rpc::account_balance(&mut substrate_client, &alice);
+            substrate_rpc::account_balance(&mut substrate_client, &bob);
+            return;
         }
         _ => print_usage(&matches),
     }
@@ -93,5 +102,6 @@ fn main() {
     let matches = clap::App::from_yaml(yaml)
         .version(env!("CARGO_PKG_VERSION"))
         .get_matches();
+
     execute(matches);
 }
