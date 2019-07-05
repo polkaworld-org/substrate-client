@@ -17,3 +17,9 @@
 
     要求： 理解升级原理，双层代码（native & Wasm）的执行逻辑。
  
+
+课后作业：
+
+        用自己最擅长的语言编写一个类似substrate-client 的对substrate 交互的客户端，或者用RUST完善现有的substrate-client.
+        
+        
