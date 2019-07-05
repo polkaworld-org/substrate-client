@@ -34,7 +34,14 @@ pub fn account_balance(client: &mut Rpc, account_id: &AccountId) {
         .wait()
         .unwrap()
         .unwrap();
-    println!("account:{:?}, balance:{:?}", account_id, balance);
+    if balance.is_string() {
+        let balance = balance.as_str().unwrap();
+        let blob = hex::decode(&balance[2..]).unwrap();
+        let balance: Option<u128> = Decode::decode(&mut blob.as_slice());
+        println!("account:{:?}, balance:{:?}", account_id, balance);
+    } else {
+        println!("account:{:?}, balance:{:?}", account_id, balance);
+    }
 }
 
 pub fn account_nonce(client: &mut Rpc, account_id: &AccountId) -> Nonce {
