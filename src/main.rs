@@ -76,12 +76,24 @@ fn execute(matches: clap::ArgMatches) {
                 substrate_genesis_hash,
                 bob,
             );
-            substrate_rpc::transfer(&mut substrate_client, tx);
+            substrate_rpc::put_transaction(&mut substrate_client, tx);
         }
         ("balance", Some(_matches)) => {
             substrate_rpc::account_balance(&mut substrate_client, &alice);
             substrate_rpc::account_balance(&mut substrate_client, &bob);
             return;
+        }
+        ("sudo", Some(_matches)) => {
+            let new = read_a_file().unwrap();
+            let tx = substrate_rpc::generate_sudo_tx(
+                &alice_pair,
+                alice,
+                index,
+                substrate_genesis_hash,
+                new,
+            );
+
+            substrate_rpc::put_transaction(&mut substrate_client, tx);
         }
         _ => print_usage(&matches),
     }

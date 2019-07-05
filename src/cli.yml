@@ -6,3 +6,5 @@ subcommands:
       about: Author and sign a Node balances::Transfer transaction with a given (secret) key
   - balance:
       about: Query balance
+  - sudo:
+	  about: Upgrade blockchain

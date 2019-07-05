@@ -63,7 +63,7 @@ pub fn account_nonce(client: &mut Rpc, account_id: &AccountId) -> Nonce {
     }
 }
 
-pub fn transfer(client: &mut Rpc, tx: String) -> u64 {
+pub fn put_transaction(client: &mut Rpc, tx: String) -> u64 {
     client
         .request::<u64>("author_submitAndWatchExtrinsic", vec![json!(tx)])
         .wait()
@@ -82,6 +82,20 @@ pub fn generate_transfer_tx(
         to.into(),
         10000 as u128,
     ));
+
+    generate_tx(pair, from, func, index, (Era::Immortal, hash))
+}
+
+pub fn generate_sudo_tx(
+    pair: &Pair,
+    from: AccountId,
+    index: Nonce,
+    hash: Hash,
+    new: Vec<u8>,
+) -> String {
+    let func = runtime::Call::Sudo(runtime::SudoCall::sudo::<runtime::Runtime>(Box::new(
+        runtime::Call::System(runtime::SystemCall::set_code::<runtime::Runtime>(new)),
+    )));
 
     generate_tx(pair, from, func, index, (Era::Immortal, hash))
 }
