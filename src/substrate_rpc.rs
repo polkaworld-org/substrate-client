@@ -86,6 +86,30 @@ pub fn generate_transfer_tx(
     generate_tx(pair, from, func, index, (Era::Immortal, hash))
 }
 
+pub fn generate_payment_tx(
+    pair: &Pair,
+    from: AccountId,
+    index: Nonce,
+    hash: Hash,
+) -> String {
+    let func = runtime::Call::Demo(runtime::DemoCall::set_payment::<runtime::Runtime>(
+        10000 as u128,
+    ));
+
+    generate_tx(pair, from, func, index, (Era::Immortal, hash))
+}
+
+pub fn generate_play_tx(
+    pair: &Pair,
+    from: AccountId,
+    index: Nonce,
+    hash: Hash,
+) -> String {
+    let func = runtime::Call::Demo(runtime::DemoCall::play::<runtime::Runtime>());
+
+    generate_tx(pair, from, func, index, (Era::Immortal, hash))
+}
+
 pub fn generate_sudo_tx(
     pair: &Pair,
     from: AccountId,

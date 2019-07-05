@@ -95,6 +95,24 @@ fn execute(matches: clap::ArgMatches) {
 
             substrate_rpc::put_transaction(&mut substrate_client, tx);
         }
+        ("payment", Some(_mathes)) => {
+            let tx = substrate_rpc::generate_payment_tx(
+                &alice_pair,
+                alice,
+                index,
+                substrate_genesis_hash,
+            );
+            substrate_rpc::put_transaction(&mut substrate_client, tx);
+        }
+        ("play", Some(_mathes)) => {
+            let tx = substrate_rpc::generate_play_tx(
+                &alice_pair,
+                alice,
+                index,
+                substrate_genesis_hash,
+            );
+            substrate_rpc::put_transaction(&mut substrate_client, tx);
+        }
         _ => print_usage(&matches),
     }
 

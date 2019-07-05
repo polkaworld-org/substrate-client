@@ -7,4 +7,8 @@ subcommands:
   - balance:
       about: Query balance
   - sudo:
-	  about: Upgrade blockchain
+      about: Upgrade blockchain
+  - payment:
+      about: Set demo payment 
+  - play:
+      about: Play demo game
