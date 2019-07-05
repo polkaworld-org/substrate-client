@@ -22,4 +22,5 @@
 
         用自己最擅长的语言编写一个类似substrate-client 的对substrate 交互的客户端，或者用RUST完善现有的substrate-client.
         
-        
+  
+  程序猿开发经验总结：https://github.com/polkaworld-org/substrate-client/blob/master/blockchain-thinking.jpeg
